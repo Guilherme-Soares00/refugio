@@ -23,6 +23,7 @@ final class BancoTeste {
     }
 
     static void configurar(DynamicPropertyRegistry registry) {
+        registry.add("app.jwt.secret", () -> "dGVzdC1vbmx5LXNlY3JldC0zMi1ieXRlcy1taW5pbXVtLTAwMDA=");
         registry.add("spring.datasource.url", BancoTeste::url);
         registry.add("spring.datasource.username", BancoTeste::usuario);
         registry.add("spring.datasource.password", BancoTeste::senha);

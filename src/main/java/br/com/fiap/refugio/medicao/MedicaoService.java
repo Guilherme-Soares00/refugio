@@ -22,6 +22,7 @@ public class MedicaoService {
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value="pontoDetalhe", key="#dto.pontoId()")
     public MedicaoDetail criar(MedicaoCreate dto) {
         return MedicaoDetail.de(medicoes.saveAndFlush(new Medicao(ponto(dto.pontoId()), dto.temperaturaC(),
                 dto.umidadePct(), dto.origem(), dto.medidaEm())));

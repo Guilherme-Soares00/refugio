@@ -1,6 +1,8 @@
 package br.com.fiap.refugio.recurso;
 
 import jakarta.validation.Valid;
+import org.springframework.hateoas.*;
+import br.com.fiap.refugio.common.Hipermidia;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
@@ -16,8 +18,10 @@ public class RecursoController {
     }
 
     @GetMapping("/pontos/{id}/recursos")
-    public List<RecursoDetail> listar(@PathVariable Long id) {
-        return service.listar(id);
+    public CollectionModel<EntityModel<RecursoDetail>> listar(@PathVariable Long id) {
+        return CollectionModel.of(service.listar(id).stream().map(dto -> EntityModel.of(dto,
+                Hipermidia.link("/api/pontos/"+dto.pontoId(),"ponto"))).toList(),
+                Hipermidia.link("/api/pontos/"+id+"/recursos","self"), Hipermidia.link("/api/pontos/"+id,"ponto"));
     }
 
     @PostMapping("/recursos")

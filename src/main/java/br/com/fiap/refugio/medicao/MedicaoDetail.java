@@ -3,6 +3,7 @@ package br.com.fiap.refugio.medicao;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+@org.springframework.hateoas.server.core.Relation(collectionRelation="medicoes")
 public record MedicaoDetail(Long id, Long pontoId, BigDecimal temperaturaC, BigDecimal umidadePct,
                             OrigemMedicao origem, Instant medidaEm) {
     public static MedicaoDetail de(Medicao medicao) {

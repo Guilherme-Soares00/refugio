@@ -34,10 +34,34 @@ public class PontoService {
     public Pagina<PontoSummary> listar(Paginacao consulta) {
         var pageable = consulta.pageable(Set.of("id", "codigoPublico", "nome", "bairro", "horarioTexto", "status"),
                 Sort.by("nome"));
-        return Pagina.de(pontos.findByStatus(StatusPonto.ATIVO, pageable).map(PontoSummary::de));
+        return Pagina.de((consulta.sort() == null
+                ? pontos.findByStatusOrderByNomeAsc(StatusPonto.ATIVO, org.springframework.data.domain.PageRequest.of(consulta.page(), consulta.size(), Sort.by("id")))
+                : pontos.findByStatus(StatusPonto.ATIVO, pageable)).map(PontoSummary::de));
     }
 
     @Transactional(readOnly = true)
+    public Pagina<PontoSummary> buscar(String bairro, StatusPonto status, br.com.fiap.refugio.recurso.TipoRecurso tipo, Paginacao consulta) {
+        var pageable = consulta.pageable(Set.of("id", "codigoPublico", "nome", "bairro", "horarioTexto", "status"), Sort.by("nome"));
+        StatusPonto filtroStatus = status == null ? StatusPonto.ATIVO : status;
+        if ((bairro == null || bairro.isBlank()) && tipo != null) {
+            return Pagina.de(pontos.buscarComRecursoDisponivel(tipo, filtroStatus, pageable).map(PontoSummary::de));
+        }
+        org.springframework.data.jpa.domain.Specification<PontoRefugio> filtro = (root, query, cb) -> cb.equal(root.get("status"), filtroStatus);
+        if (bairro != null && !bairro.isBlank()) {
+            filtro = filtro.and((root, query, cb) -> cb.equal(cb.lower(root.get("bairro")), bairro.trim().toLowerCase(java.util.Locale.ROOT)));
+        }
+        if (tipo != null) {
+            filtro = filtro.and((root, query, cb) -> {
+                query.distinct(true);
+                var recurso = root.join("recursos");
+                return cb.and(cb.equal(recurso.get("tipo"), tipo), cb.isTrue(recurso.get("disponivel")));
+            });
+        }
+        return Pagina.de(pontos.findAll(filtro, pageable).map(PontoSummary::de));
+    }
+
+    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value="pontoDetalhe", key="#id")
     public PontoDetail detalhar(Long id) {
         var ponto = pontos.findDetalhadoById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Ponto não encontrado"));
         var ultima = medicoes.findFirstByPontoIdOrderByMedidaEmDescIdDesc(id)
@@ -53,6 +77,7 @@ public class PontoService {
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value="pontoDetalhe", key="#id")
     public void atualizar(Long id, PontoUpdate dto) {
         var ponto = exigir(id);
         ponto.setNome(dto.nome());
@@ -67,6 +92,7 @@ public class PontoService {
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value="pontoDetalhe", key="#id")
     public void excluir(Long id) {
         pontos.delete(exigir(id));
         pontos.flush();

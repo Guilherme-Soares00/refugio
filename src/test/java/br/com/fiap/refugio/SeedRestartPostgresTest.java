@@ -50,6 +50,7 @@ class SeedRestartPostgresTest {
 
     private ConfigurableApplicationContext iniciar(boolean seed, String ddl) {
         return new SpringApplicationBuilder(RefugioApplication.class).web(WebApplicationType.NONE).run(
+                "--app.jwt.secret=dGVzdC1vbmx5LXNlY3JldC0zMi1ieXRlcy1taW5pbXVtLTAwMDA=",
                 "--spring.datasource.url=" + BancoTeste.url(),
                 "--spring.datasource.username=" + BancoTeste.usuario(),
                 "--spring.datasource.password=" + BancoTeste.senha(),
