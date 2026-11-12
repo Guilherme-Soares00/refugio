@@ -1,5 +1,4 @@
 package br.com.fiap.refugio.config;
-import br.com.fiap.refugio.auth.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.*;

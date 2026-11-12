@@ -1,15 +1,17 @@
 package br.com.fiap.refugio;
 
-import br.com.fiap.refugio.medicao.Medicao;
-import br.com.fiap.refugio.medicao.OrigemMedicao;
-import br.com.fiap.refugio.ocorrencia.CategoriaOcorrencia;
-import br.com.fiap.refugio.ocorrencia.Ocorrencia;
-import br.com.fiap.refugio.ocorrencia.PrioridadeOcorrencia;
-import br.com.fiap.refugio.ocorrencia.StatusOcorrencia;
-import br.com.fiap.refugio.ponto.PontoRefugio;
-import br.com.fiap.refugio.ponto.StatusPonto;
-import br.com.fiap.refugio.auth.Papel;
-import br.com.fiap.refugio.auth.Usuario;
+import br.com.fiap.refugio.model.CategoriaOcorrencia;
+import br.com.fiap.refugio.model.Medicao;
+import br.com.fiap.refugio.model.Ocorrencia;
+import br.com.fiap.refugio.model.OrigemMedicao;
+import br.com.fiap.refugio.model.Papel;
+import br.com.fiap.refugio.model.PontoRefugio;
+import br.com.fiap.refugio.model.PrioridadeOcorrencia;
+import br.com.fiap.refugio.model.StatusOcorrencia;
+import br.com.fiap.refugio.model.StatusPonto;
+import br.com.fiap.refugio.model.Usuario;
+
+
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.AfterAll;

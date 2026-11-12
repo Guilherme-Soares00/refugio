@@ -353,7 +353,7 @@ class FinalHttpPostgresTest {
     @Test
     void chaveJwtVaziaFracaOuBase64InvalidaFalhaSemExporValor() {
         for(String secret:new String[]{"","fraca","%%%"}) {
-            org.assertj.core.api.Assertions.assertThatThrownBy(()->new br.com.fiap.refugio.auth.JwtService(secret,3600))
+            org.assertj.core.api.Assertions.assertThatThrownBy(()->new br.com.fiap.refugio.service.JwtService(secret,3600))
                     .isInstanceOf(IllegalStateException.class).hasMessageContaining("JWT_SECRET");
         }
     }

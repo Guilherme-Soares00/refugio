@@ -1,6 +1,8 @@
 package br.com.fiap.refugio.config;
 
-import br.com.fiap.refugio.common.ApiError;
+import br.com.fiap.refugio.dto.ApiError;
+
+
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.*;

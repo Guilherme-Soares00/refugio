@@ -1,22 +1,24 @@
 package br.com.fiap.refugio.config;
 
-import br.com.fiap.refugio.medicao.Medicao;
-import br.com.fiap.refugio.medicao.MedicaoRepository;
-import br.com.fiap.refugio.medicao.OrigemMedicao;
-import br.com.fiap.refugio.ocorrencia.CategoriaOcorrencia;
-import br.com.fiap.refugio.ocorrencia.Ocorrencia;
-import br.com.fiap.refugio.ocorrencia.OcorrenciaRepository;
-import br.com.fiap.refugio.ocorrencia.PrioridadeOcorrencia;
-import br.com.fiap.refugio.ocorrencia.StatusOcorrencia;
-import br.com.fiap.refugio.ponto.PontoRefugio;
-import br.com.fiap.refugio.ponto.PontoRefugioRepository;
-import br.com.fiap.refugio.ponto.StatusPonto;
-import br.com.fiap.refugio.recurso.RecursoPonto;
-import br.com.fiap.refugio.recurso.RecursoPontoRepository;
-import br.com.fiap.refugio.recurso.TipoRecurso;
-import br.com.fiap.refugio.auth.Papel;
-import br.com.fiap.refugio.auth.Usuario;
-import br.com.fiap.refugio.auth.UsuarioRepository;
+import br.com.fiap.refugio.model.CategoriaOcorrencia;
+import br.com.fiap.refugio.model.Medicao;
+import br.com.fiap.refugio.model.Ocorrencia;
+import br.com.fiap.refugio.model.OrigemMedicao;
+import br.com.fiap.refugio.model.Papel;
+import br.com.fiap.refugio.model.PontoRefugio;
+import br.com.fiap.refugio.model.PrioridadeOcorrencia;
+import br.com.fiap.refugio.model.RecursoPonto;
+import br.com.fiap.refugio.model.StatusOcorrencia;
+import br.com.fiap.refugio.model.StatusPonto;
+import br.com.fiap.refugio.model.TipoRecurso;
+import br.com.fiap.refugio.model.Usuario;
+import br.com.fiap.refugio.repository.MedicaoRepository;
+import br.com.fiap.refugio.repository.OcorrenciaRepository;
+import br.com.fiap.refugio.repository.PontoRefugioRepository;
+import br.com.fiap.refugio.repository.RecursoPontoRepository;
+import br.com.fiap.refugio.repository.UsuarioRepository;
+
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ClassPathResource;

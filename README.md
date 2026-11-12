@@ -163,13 +163,12 @@ O cache `pontoDetalhe` guarda os dados de cada ponto por ID, incluindo recursos 
 
 ```text
 src/main/java/br/com/fiap/refugio/
-  auth/        cadastro, login, usuário e JWT
-  ponto/       entidade, repository, service, controller e DTOs
-  recurso/     entidade, repository, service, controller e DTOs
-  medicao/     entidade, repository, service, controller e DTOs
-  ocorrencia/  entidade, repository, service, controller e DTOs
-  common/      erros e paginação
-  config/      configurações e seed
+  controller/  rotas HTTP e hipermídia
+  service/     regras de negócio e transações
+  repository/  consultas JPA
+  model/       entidades e enums
+  dto/         entrada, saída, paginação e erros
+  config/      segurança, cache, OpenAPI e carga inicial
 ```
 
 ## Testes

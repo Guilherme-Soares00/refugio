@@ -1,6 +1,8 @@
 package br.com.fiap.refugio;
 
-import br.com.fiap.refugio.common.ApiExceptionHandler;
+import br.com.fiap.refugio.config.ApiExceptionHandler;
+
+
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.GetMapping;

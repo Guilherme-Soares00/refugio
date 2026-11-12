@@ -1,11 +1,13 @@
 package br.com.fiap.refugio;
 
 import br.com.fiap.refugio.config.SeedDemonstrativo;
-import br.com.fiap.refugio.medicao.MedicaoRepository;
-import br.com.fiap.refugio.ocorrencia.OcorrenciaRepository;
-import br.com.fiap.refugio.ponto.PontoRefugioRepository;
-import br.com.fiap.refugio.recurso.RecursoPontoRepository;
-import br.com.fiap.refugio.auth.UsuarioRepository;
+import br.com.fiap.refugio.repository.MedicaoRepository;
+import br.com.fiap.refugio.repository.OcorrenciaRepository;
+import br.com.fiap.refugio.repository.PontoRefugioRepository;
+import br.com.fiap.refugio.repository.RecursoPontoRepository;
+import br.com.fiap.refugio.repository.UsuarioRepository;
+
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Hibernate;
