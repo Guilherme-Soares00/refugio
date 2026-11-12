@@ -1,5 +1,7 @@
 package br.com.fiap.refugio.service;
 
+import static br.com.fiap.refugio.config.CacheConfig.PONTO_DETALHE;
+
 import br.com.fiap.refugio.config.ApiException;
 import br.com.fiap.refugio.dto.MedicaoDetail;
 import br.com.fiap.refugio.dto.Pagina;
@@ -35,6 +37,9 @@ import java.util.Set;
 
 @Service
 public class PontoService {
+    private static final Set<String> CAMPOS_ORDENACAO =
+            Set.of("id", "codigoPublico", "nome", "bairro", "horarioTexto", "status");
+
     private final PontoRefugioRepository pontos;
     private final MedicaoRepository medicoes;
     private final String avisoDados;
@@ -50,10 +55,7 @@ public class PontoService {
 
     @Transactional(readOnly = true)
     public Pagina<PontoSummary> listar(Paginacao consulta) {
-        var pageable =
-                consulta.pageable(
-                        Set.of("id", "codigoPublico", "nome", "bairro", "horarioTexto", "status"),
-                        Sort.by("nome"));
+        var pageable = consulta.pageable(CAMPOS_ORDENACAO, Sort.by("nome"));
         Page<PontoRefugio> pagina;
         if (consulta.sort() == null) {
             var ordenacaoPadrao = PageRequest.of(consulta.page(), consulta.size(), Sort.by("id"));
@@ -67,10 +69,7 @@ public class PontoService {
     @Transactional(readOnly = true)
     public Pagina<PontoSummary> buscar(
             String bairro, StatusPonto status, TipoRecurso tipo, Paginacao consulta) {
-        var pageable =
-                consulta.pageable(
-                        Set.of("id", "codigoPublico", "nome", "bairro", "horarioTexto", "status"),
-                        Sort.by("nome"));
+        var pageable = consulta.pageable(CAMPOS_ORDENACAO, Sort.by("nome"));
         StatusPonto filtroStatus = status == null ? StatusPonto.ATIVO : status;
         if ((bairro == null || bairro.isBlank()) && tipo != null) {
             return Pagina.de(
@@ -102,7 +101,7 @@ public class PontoService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "pontoDetalhe", key = "#id")
+    @Cacheable(value = PONTO_DETALHE, key = "#id")
     public PontoDetail detalhar(Long id) {
         var ponto =
                 pontos.findDetalhadoById(id)
@@ -143,7 +142,7 @@ public class PontoService {
     }
 
     @Transactional
-    @CacheEvict(value = "pontoDetalhe", key = "#id")
+    @CacheEvict(value = PONTO_DETALHE, key = "#id")
     public void atualizar(Long id, PontoUpdate dto) {
         var ponto = exigir(id);
         ponto.setNome(dto.nome());
@@ -158,7 +157,7 @@ public class PontoService {
     }
 
     @Transactional
-    @CacheEvict(value = "pontoDetalhe", key = "#id")
+    @CacheEvict(value = PONTO_DETALHE, key = "#id")
     public void excluir(Long id) {
         pontos.delete(exigir(id));
         pontos.flush();

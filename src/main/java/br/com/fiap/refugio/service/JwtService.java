@@ -1,5 +1,6 @@
 package br.com.fiap.refugio.service;
 
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -15,6 +16,7 @@ import javax.crypto.SecretKey;
 @Service
 public class JwtService {
     private final SecretKey key;
+    private final JwtParser parser;
     private final long expiracao;
 
     public JwtService(
@@ -25,6 +27,7 @@ public class JwtService {
             if (bytes.length < 32 || expiracao < 1) throw new IllegalArgumentException();
             this.key = Keys.hmacShaKeyFor(bytes);
             this.expiracao = expiracao;
+            this.parser = Jwts.parser().verifyWith(key).build();
         } catch (IllegalArgumentException ex) {
             throw new IllegalStateException(
                     "JWT_SECRET deve ser Base64 de ao menos 256 bits e a expiração deve ser positiva");
@@ -42,13 +45,7 @@ public class JwtService {
     }
 
     public Long usuarioId(String token) {
-        return Long.valueOf(
-                Jwts.parser()
-                        .verifyWith(key)
-                        .build()
-                        .parseSignedClaims(token)
-                        .getPayload()
-                        .getSubject());
+        return Long.valueOf(parser.parseSignedClaims(token).getPayload().getSubject());
     }
 
     public long expiracao() {

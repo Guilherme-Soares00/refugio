@@ -9,8 +9,10 @@ import org.springframework.context.annotation.*;
 @Configuration
 @EnableCaching
 public class CacheConfig {
+    public static final String PONTO_DETALHE = "pontoDetalhe";
+
     @Bean
     CacheManager cacheManager() {
-        return new TransactionAwareCacheManagerProxy(new ConcurrentMapCacheManager("pontoDetalhe"));
+        return new TransactionAwareCacheManagerProxy(new ConcurrentMapCacheManager(PONTO_DETALHE));
     }
 }

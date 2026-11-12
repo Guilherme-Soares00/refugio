@@ -1,5 +1,7 @@
 package br.com.fiap.refugio.service;
 
+import static br.com.fiap.refugio.config.CacheConfig.PONTO_DETALHE;
+
 import br.com.fiap.refugio.config.ApiException;
 import br.com.fiap.refugio.dto.MedicaoCreate;
 import br.com.fiap.refugio.dto.MedicaoDetail;
@@ -29,7 +31,7 @@ public class MedicaoService {
     }
 
     @Transactional
-    @CacheEvict(value = "pontoDetalhe", key = "#dto.pontoId()")
+    @CacheEvict(value = PONTO_DETALHE, key = "#dto.pontoId()")
     public MedicaoDetail criar(MedicaoCreate dto) {
         return MedicaoDetail.de(
                 medicoes.saveAndFlush(

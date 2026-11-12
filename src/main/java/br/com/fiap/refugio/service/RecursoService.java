@@ -1,5 +1,7 @@
 package br.com.fiap.refugio.service;
 
+import static br.com.fiap.refugio.config.CacheConfig.PONTO_DETALHE;
+
 import br.com.fiap.refugio.config.ApiException;
 import br.com.fiap.refugio.dto.RecursoCreate;
 import br.com.fiap.refugio.dto.RecursoDetail;
@@ -38,7 +40,7 @@ public class RecursoService {
     }
 
     @Transactional
-    @CacheEvict(value = "pontoDetalhe", key = "#dto.pontoId()")
+    @CacheEvict(value = PONTO_DETALHE, key = "#dto.pontoId()")
     public RecursoDetail criar(RecursoCreate dto) {
         return RecursoDetail.de(
                 recursos.saveAndFlush(
@@ -58,8 +60,8 @@ public class RecursoService {
         recurso.setDisponivel(dto.disponivel());
         recurso.setAtualizadoEm(Instant.now());
         recursos.flush();
-        cache.getCache("pontoDetalhe").evict(anterior);
-        cache.getCache("pontoDetalhe").evict(dto.pontoId());
+        cache.getCache(PONTO_DETALHE).evict(anterior);
+        cache.getCache(PONTO_DETALHE).evict(dto.pontoId());
     }
 
     @Transactional
@@ -68,7 +70,7 @@ public class RecursoService {
         Long pontoId = recurso.getPonto().getId();
         recursos.delete(recurso);
         recursos.flush();
-        cache.getCache("pontoDetalhe").evict(pontoId);
+        cache.getCache(PONTO_DETALHE).evict(pontoId);
     }
 
     private RecursoPonto exigir(Long id) {
