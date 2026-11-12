@@ -22,17 +22,21 @@ public class SecurityConfig {
     SecurityFilterChain seguranca(
             HttpSecurity http, JwtFilter jwt, SecurityErrors errors, CorsFilter cors)
             throws Exception {
-        return http.csrf(c -> c.disable())
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .requestCache(c -> c.disable())
-                .httpBasic(c -> c.disable())
-                .formLogin(c -> c.disable())
-                .logout(c -> c.disable())
+        return http.csrf(csrf -> csrf.disable())
+                .sessionManagement(
+                        sessao -> sessao.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .requestCache(cache -> cache.disable())
+                .httpBasic(basic -> basic.disable())
+                .formLogin(formulario -> formulario.disable())
+                .logout(logout -> logout.disable())
                 .exceptionHandling(
                         e ->
-                                e.authenticationEntryPoint((r, s, x) -> errors.escrever(r, s, 401))
+                                e.authenticationEntryPoint(
+                                                (request, response, excecao) ->
+                                                        errors.escrever(request, response, 401))
                                         .accessDeniedHandler(
-                                                (r, s, x) -> errors.escrever(r, s, 403)))
+                                                (request, response, excecao) ->
+                                                        errors.escrever(request, response, 403)))
                 .authorizeHttpRequests(
                         a ->
                                 a.requestMatchers("/error")
@@ -84,10 +88,11 @@ public class SecurityConfig {
         var allowed =
                 Arrays.stream(origins.split(","))
                         .map(String::trim)
-                        .filter(s -> !s.isEmpty())
+                        .filter(origem -> !origem.isEmpty())
                         .toList();
-        if (allowed.stream().anyMatch(s -> s.contains("*")))
+        if (allowed.stream().anyMatch(origem -> origem.contains("*"))) {
             throw new IllegalStateException("CORS exige origens explícitas");
+        }
         configuration.setAllowedOrigins(allowed);
         configuration.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

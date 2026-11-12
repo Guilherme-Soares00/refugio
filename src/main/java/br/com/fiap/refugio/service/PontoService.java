@@ -19,6 +19,7 @@ import br.com.fiap.refugio.repository.PontoRefugioRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -53,14 +54,14 @@ public class PontoService {
                 consulta.pageable(
                         Set.of("id", "codigoPublico", "nome", "bairro", "horarioTexto", "status"),
                         Sort.by("nome"));
-        return Pagina.de(
-                (consulta.sort() == null
-                                ? pontos.findByStatusOrderByNomeAsc(
-                                        StatusPonto.ATIVO,
-                                        PageRequest.of(
-                                                consulta.page(), consulta.size(), Sort.by("id")))
-                                : pontos.findByStatus(StatusPonto.ATIVO, pageable))
-                        .map(PontoSummary::de));
+        Page<PontoRefugio> pagina;
+        if (consulta.sort() == null) {
+            var ordenacaoPadrao = PageRequest.of(consulta.page(), consulta.size(), Sort.by("id"));
+            pagina = pontos.findByStatusOrderByNomeAsc(StatusPonto.ATIVO, ordenacaoPadrao);
+        } else {
+            pagina = pontos.findByStatus(StatusPonto.ATIVO, pageable);
+        }
+        return Pagina.de(pagina.map(PontoSummary::de));
     }
 
     @Transactional(readOnly = true)

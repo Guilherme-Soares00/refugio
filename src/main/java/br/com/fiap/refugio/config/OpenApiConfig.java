@@ -48,106 +48,54 @@ public class OpenApiConfig {
                             (path, item) ->
                                     item.readOperationsMap()
                                             .forEach(
-                                                    (method, operation) -> {
-                                                        boolean auth =
-                                                                path.startsWith("/api/auth/");
-                                                        boolean leituraPublica =
-                                                                method == PathItem.HttpMethod.GET
-                                                                        && path.startsWith(
-                                                                                "/api/pontos");
-                                                        boolean protegido =
-                                                                !auth && !leituraPublica;
-                                                        if (protegido)
-                                                            operation.setSecurity(
-                                                                    List.of(
-                                                                            new SecurityRequirement()
-                                                                                    .addList(
-                                                                                            "bearerAuth")));
-                                                        operation.setSummary(resumo(path, method));
-                                                        operation
-                                                                .getResponses()
-                                                                .entrySet()
-                                                                .removeIf(
-                                                                        e ->
-                                                                                Integer.parseInt(
-                                                                                                e
-                                                                                                        .getKey())
-                                                                                        >= 400);
-                                                        if (method == PathItem.HttpMethod.POST) {
-                                                            String sucesso =
-                                                                    path.endsWith("/login")
-                                                                            ? "200"
-                                                                            : "201";
-                                                            var response =
-                                                                    operation
-                                                                            .getResponses()
-                                                                            .remove("200");
-                                                            if (response == null)
-                                                                response = new ApiResponse();
-                                                            operation
-                                                                    .getResponses()
-                                                                    .addApiResponse(
-                                                                            sucesso,
-                                                                            response.description(
-                                                                                    sucesso.equals(
-                                                                                                    "201")
-                                                                                            ? "Registro criado"
-                                                                                            : "Login realizado"));
-                                                        } else if (method
-                                                                != PathItem.HttpMethod.GET) {
-                                                            operation.getResponses().clear();
-                                                            operation
-                                                                    .getResponses()
-                                                                    .addApiResponse(
-                                                                            "204",
-                                                                            new ApiResponse()
-                                                                                    .description(
-                                                                                            "Operação concluída sem conteúdo"));
-                                                        }
-                                                        erro(
-                                                                operation,
-                                                                "400",
-                                                                "Dados da requisição inválidos");
-                                                        erro(
-                                                                operation,
-                                                                "401",
-                                                                "Autenticação necessária ou token inválido");
-                                                        if (protegido)
-                                                            erro(
-                                                                    operation,
-                                                                    "403",
-                                                                    "Papel sem permissão");
-                                                        if (!auth && !path.endsWith("/minhas"))
-                                                            erro(
-                                                                    operation,
-                                                                    "404",
-                                                                    "Registro não encontrado");
-                                                        if (method != PathItem.HttpMethod.GET
-                                                                && !path.endsWith("/login"))
-                                                            erro(
-                                                                    operation,
-                                                                    "409",
-                                                                    "Conflito com dados, vínculos ou transição de status");
-                                                    }));
+                                                    (method, operation) ->
+                                                            documentarOperacao(
+                                                                    path, method, operation)));
         };
     }
 
+    private static void documentarOperacao(
+            String path, PathItem.HttpMethod method, Operation operation) {
+        boolean auth = path.startsWith("/api/auth/");
+        boolean leituraPublica =
+                method == PathItem.HttpMethod.GET && path.startsWith("/api/pontos");
+        boolean protegido = !auth && !leituraPublica;
+        if (protegido)
+            operation.setSecurity(List.of(new SecurityRequirement().addList("bearerAuth")));
+        operation.setSummary(resumo(path, method));
+        operation.getResponses().entrySet().removeIf(e -> Integer.parseInt(e.getKey()) >= 400);
+        if (method == PathItem.HttpMethod.POST) {
+            String sucesso = path.endsWith("/login") ? "200" : "201";
+            var response = operation.getResponses().remove("200");
+            if (response == null) response = new ApiResponse();
+            operation
+                    .getResponses()
+                    .addApiResponse(
+                            sucesso,
+                            response.description(
+                                    sucesso.equals("201") ? "Registro criado" : "Login realizado"));
+        } else if (method != PathItem.HttpMethod.GET) {
+            operation.getResponses().clear();
+            operation
+                    .getResponses()
+                    .addApiResponse(
+                            "204",
+                            new ApiResponse().description("Operação concluída sem conteúdo"));
+        }
+        erro(operation, "400", "Dados da requisição inválidos");
+        erro(operation, "401", "Autenticação necessária ou token inválido");
+        if (protegido) erro(operation, "403", "Papel sem permissão");
+        if (!auth && !path.endsWith("/minhas")) erro(operation, "404", "Registro não encontrado");
+        if (method != PathItem.HttpMethod.GET && !path.endsWith("/login"))
+            erro(operation, "409", "Conflito com dados, vínculos ou transição de status");
+    }
+
     private static void erro(Operation operation, String status, String descricao) {
-        operation
-                .getResponses()
-                .addApiResponse(
-                        status,
-                        new ApiResponse()
-                                .description(descricao)
-                                .content(
-                                        new Content()
-                                                .addMediaType(
-                                                        "application/json",
-                                                        new MediaType()
-                                                                .schema(
-                                                                        new Schema<>()
-                                                                                .$ref(
-                                                                                        "#/components/schemas/ApiError")))));
+        var schema = new Schema<>().$ref("#/components/schemas/ApiError");
+        var conteudo =
+                new Content().addMediaType("application/json", new MediaType().schema(schema));
+        var resposta = new ApiResponse().description(descricao).content(conteudo);
+        operation.getResponses().addApiResponse(status, resposta);
     }
 
     private static String resumo(String path, PathItem.HttpMethod method) {
@@ -156,14 +104,16 @@ public class OpenApiConfig {
         if (path.endsWith("/busca")) return "Buscar pontos por bairro, status e recurso disponível";
         if (path.endsWith("/minhas")) return "Listar ocorrências do usuário autenticado";
         if (path.endsWith("/status")) return "Avançar status da ocorrência";
-        String dominio =
-                path.contains("recursos")
-                        ? "recursos"
-                        : path.contains("medicoes")
-                                ? "medições"
-                                : path.contains("ocorrencias")
-                                        ? "ocorrências"
-                                        : "pontos de refúgio";
+        String dominio;
+        if (path.contains("recursos")) {
+            dominio = "recursos";
+        } else if (path.contains("medicoes")) {
+            dominio = "medições";
+        } else if (path.contains("ocorrencias")) {
+            dominio = "ocorrências";
+        } else {
+            dominio = "pontos de refúgio";
+        }
         return switch (method) {
             case GET -> "Consultar " + dominio;
             case POST -> "Cadastrar " + dominio;

@@ -88,14 +88,19 @@ public class OcorrenciaService {
                                 () ->
                                         new ApiException(
                                                 HttpStatus.NOT_FOUND, "Ocorrência não encontrada"));
+        StatusOcorrencia statusAtual = ocorrencia.getStatus();
         boolean permitido =
-                ocorrencia.getStatus() == StatusOcorrencia.ABERTA
-                                && status == StatusOcorrencia.EM_ANALISE
-                        || ocorrencia.getStatus() == StatusOcorrencia.EM_ANALISE
-                                && status == StatusOcorrencia.RESOLVIDA;
-        if (!permitido) throw new ApiException(HttpStatus.CONFLICT, "Transição de status inválida");
+                (statusAtual == StatusOcorrencia.ABERTA && status == StatusOcorrencia.EM_ANALISE)
+                        || (statusAtual == StatusOcorrencia.EM_ANALISE
+                                && status == StatusOcorrencia.RESOLVIDA);
+        if (!permitido) {
+            throw new ApiException(HttpStatus.CONFLICT, "Transição de status inválida");
+        }
+
         ocorrencia.setStatus(status);
-        if (status == StatusOcorrencia.RESOLVIDA) ocorrencia.setResolvidaEm(Instant.now());
+        if (status == StatusOcorrencia.RESOLVIDA) {
+            ocorrencia.setResolvidaEm(Instant.now());
+        }
         ocorrencias.flush();
     }
 }

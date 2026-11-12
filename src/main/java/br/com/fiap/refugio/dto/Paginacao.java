@@ -24,22 +24,18 @@ public record Paginacao(int page, int size, List<String> sort) {
         } else {
             for (String valor : sort) {
                 String[] partes = valor.split(",", -1);
-                if (partes.length > 2
-                        || !campos.contains(partes[0])
-                        || (partes.length == 2
-                                && !partes[1].equalsIgnoreCase("asc")
-                                && !partes[1].equalsIgnoreCase("desc"))) {
+                String campo = partes[0];
+                String direcao = partes.length == 2 ? partes[1] : "asc";
+                boolean direcaoValida =
+                        direcao.equalsIgnoreCase("asc") || direcao.equalsIgnoreCase("desc");
+
+                if (partes.length > 2 || !campos.contains(campo) || !direcaoValida) {
                     throw new ApiException(HttpStatus.BAD_REQUEST, "Ordenação inválida");
                 }
-                if (ordens.stream().anyMatch(ordem -> ordem.getProperty().equals(partes[0]))) {
+                if (ordens.stream().anyMatch(ordem -> ordem.getProperty().equals(campo))) {
                     throw new ApiException(HttpStatus.BAD_REQUEST, "Campo de ordenação repetido");
                 }
-                ordens.add(
-                        new Sort.Order(
-                                partes.length == 1
-                                        ? Sort.Direction.ASC
-                                        : Sort.Direction.fromString(partes[1]),
-                                partes[0]));
+                ordens.add(new Sort.Order(Sort.Direction.fromString(direcao), campo));
             }
         }
         if (ordens.stream().noneMatch(ordem -> ordem.getProperty().equals("id"))) {

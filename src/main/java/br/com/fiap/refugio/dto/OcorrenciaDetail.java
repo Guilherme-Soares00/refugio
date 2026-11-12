@@ -20,16 +20,16 @@ public record OcorrenciaDetail(
         StatusOcorrencia status,
         Instant abertaEm,
         Instant resolvidaEm) {
-    public static OcorrenciaDetail de(Ocorrencia o) {
+    public static OcorrenciaDetail de(Ocorrencia ocorrencia) {
         return new OcorrenciaDetail(
-                o.getId(),
-                o.getPonto().getId(),
-                o.getUsuario().getId(),
-                o.getCategoria(),
-                o.getDescricao(),
-                o.getPrioridade(),
-                o.getStatus(),
-                o.getAbertaEm(),
-                o.getResolvidaEm());
+                ocorrencia.getId(),
+                ocorrencia.getPonto().getId(),
+                ocorrencia.getUsuario().getId(),
+                ocorrencia.getCategoria(),
+                ocorrencia.getDescricao(),
+                ocorrencia.getPrioridade(),
+                ocorrencia.getStatus(),
+                ocorrencia.getAbertaEm(),
+                ocorrencia.getResolvidaEm());
     }
 }
