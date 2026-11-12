@@ -2,7 +2,6 @@ package br.com.fiap.refugio.dto;
 
 import br.com.fiap.refugio.model.StatusPonto;
 
-
 import jakarta.validation.constraints.*;
 
 public record PontoCreate(
@@ -14,5 +13,4 @@ public record PontoCreate(
         @NotBlank @Size(max = 80) String cidade,
         @NotBlank @Size(min = 2, max = 2) String uf,
         @NotBlank @Size(max = 80) String horarioTexto,
-        @NotNull StatusPonto status) {
-}
+        @NotNull StatusPonto status) {}

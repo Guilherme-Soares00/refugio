@@ -9,10 +9,12 @@ import br.com.fiap.refugio.model.RecursoPonto;
 import br.com.fiap.refugio.repository.PontoRefugioRepository;
 import br.com.fiap.refugio.repository.RecursoPontoRepository;
 
-
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -20,9 +22,10 @@ import java.util.List;
 public class RecursoService {
     private final RecursoPontoRepository recursos;
     private final PontoRefugioRepository pontos;
-    private final org.springframework.cache.CacheManager cache;
+    private final CacheManager cache;
 
-    public RecursoService(RecursoPontoRepository recursos, PontoRefugioRepository pontos, org.springframework.cache.CacheManager cache) {
+    public RecursoService(
+            RecursoPontoRepository recursos, PontoRefugioRepository pontos, CacheManager cache) {
         this.recursos = recursos;
         this.pontos = pontos;
         this.cache = cache;
@@ -35,10 +38,15 @@ public class RecursoService {
     }
 
     @Transactional
-    @org.springframework.cache.annotation.CacheEvict(value="pontoDetalhe", key="#dto.pontoId()")
+    @CacheEvict(value = "pontoDetalhe", key = "#dto.pontoId()")
     public RecursoDetail criar(RecursoCreate dto) {
-        return RecursoDetail.de(recursos.saveAndFlush(new RecursoPonto(ponto(dto.pontoId()), dto.tipo(),
-                dto.disponivel(), Instant.now())));
+        return RecursoDetail.de(
+                recursos.saveAndFlush(
+                        new RecursoPonto(
+                                ponto(dto.pontoId()),
+                                dto.tipo(),
+                                dto.disponivel(),
+                                Instant.now())));
     }
 
     @Transactional
@@ -64,10 +72,13 @@ public class RecursoService {
     }
 
     private RecursoPonto exigir(Long id) {
-        return recursos.findById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Recurso não encontrado"));
+        return recursos.findById(id)
+                .orElseThrow(
+                        () -> new ApiException(HttpStatus.NOT_FOUND, "Recurso não encontrado"));
     }
 
     private PontoRefugio ponto(Long id) {
-        return pontos.findById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Ponto não encontrado"));
+        return pontos.findById(id)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Ponto não encontrado"));
     }
 }

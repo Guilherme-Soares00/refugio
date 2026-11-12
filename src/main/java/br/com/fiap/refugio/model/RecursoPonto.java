@@ -1,12 +1,19 @@
 package br.com.fiap.refugio.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+
 import java.time.Instant;
 
 @Entity
-@Table(name = "recurso_ponto", uniqueConstraints = @UniqueConstraint(name = "uk_recurso_ponto_tipo", columnNames = {"ponto_id", "tipo"}))
+@Table(
+        name = "recurso_ponto",
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uk_recurso_ponto_tipo",
+                        columnNames = {"ponto_id", "tipo"}))
 public class RecursoPonto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,10 +37,10 @@ public class RecursoPonto {
     @Column(nullable = false)
     private Instant atualizadoEm;
 
-    protected RecursoPonto() {
-    }
+    protected RecursoPonto() {}
 
-    public RecursoPonto(PontoRefugio ponto, TipoRecurso tipo, boolean disponivel, Instant atualizadoEm) {
+    public RecursoPonto(
+            PontoRefugio ponto, TipoRecurso tipo, boolean disponivel, Instant atualizadoEm) {
         this.ponto = ponto;
         this.tipo = tipo;
         this.disponivel = disponivel;

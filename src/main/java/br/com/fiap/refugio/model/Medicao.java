@@ -1,11 +1,14 @@
 package br.com.fiap.refugio.model;
 
-import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import java.time.Instant;
+
 import org.hibernate.annotations.Check;
+
+import java.math.BigDecimal;
+import java.time.Instant;
 
 @Entity
 @Check(constraints = "temperatura_c between 0 and 60 and umidade_pct between 0 and 100")
@@ -43,10 +46,14 @@ public class Medicao {
     @Column(nullable = false)
     private Instant medidaEm;
 
-    protected Medicao() {
-    }
+    protected Medicao() {}
 
-    public Medicao(PontoRefugio ponto, BigDecimal temperaturaC, BigDecimal umidadePct, OrigemMedicao origem, Instant medidaEm) {
+    public Medicao(
+            PontoRefugio ponto,
+            BigDecimal temperaturaC,
+            BigDecimal umidadePct,
+            OrigemMedicao origem,
+            Instant medidaEm) {
         this.ponto = ponto;
         this.temperaturaC = temperaturaC;
         this.umidadePct = umidadePct;

@@ -1,16 +1,21 @@
 package br.com.fiap.refugio.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import java.time.Instant;
+
 import org.hibernate.annotations.Check;
+
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Check(constraints = "codigo_publico ~ '^REF-[0-9]{3}$' and length(trim(nome)) > 0 and length(trim(bairro)) > 0 and length(trim(horario_texto)) > 0")
+@Check(
+        constraints =
+                "codigo_publico ~ '^REF-[0-9]{3}$' and length(trim(nome)) > 0 and length(trim(bairro)) > 0 and length(trim(horario_texto)) > 0")
 public class PontoRefugio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -77,10 +82,19 @@ public class PontoRefugio {
     @OneToMany(mappedBy = "ponto", fetch = FetchType.LAZY)
     private List<Ocorrencia> ocorrencias = new ArrayList<>();
 
-    protected PontoRefugio() {
-    }
+    protected PontoRefugio() {}
 
-    public PontoRefugio(String codigoPublico, String nome, String logradouro, String numero, String bairro, String cidade, String uf, String horarioTexto, StatusPonto status, Instant cadastradoEm) {
+    public PontoRefugio(
+            String codigoPublico,
+            String nome,
+            String logradouro,
+            String numero,
+            String bairro,
+            String cidade,
+            String uf,
+            String horarioTexto,
+            StatusPonto status,
+            Instant cadastradoEm) {
         this.codigoPublico = codigoPublico;
         this.nome = nome;
         this.logradouro = logradouro;

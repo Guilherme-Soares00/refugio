@@ -1,10 +1,13 @@
 package br.com.fiap.refugio.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import java.time.Instant;
+
 import org.hibernate.annotations.Check;
+
+import java.time.Instant;
 
 @Entity
 @Check(constraints = "char_length(descricao) between 10 and 500")
@@ -49,13 +52,19 @@ public class Ocorrencia {
     @Column(nullable = false)
     private Instant abertaEm;
 
-    @Column
-    private Instant resolvidaEm;
+    @Column private Instant resolvidaEm;
 
-    protected Ocorrencia() {
-    }
+    protected Ocorrencia() {}
 
-    public Ocorrencia(PontoRefugio ponto, Usuario usuario, CategoriaOcorrencia categoria, String descricao, PrioridadeOcorrencia prioridade, StatusOcorrencia status, Instant abertaEm, Instant resolvidaEm) {
+    public Ocorrencia(
+            PontoRefugio ponto,
+            Usuario usuario,
+            CategoriaOcorrencia categoria,
+            String descricao,
+            PrioridadeOcorrencia prioridade,
+            StatusOcorrencia status,
+            Instant abertaEm,
+            Instant resolvidaEm) {
         this.ponto = ponto;
         this.usuario = usuario;
         this.categoria = categoria;

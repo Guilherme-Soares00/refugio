@@ -1,8 +1,10 @@
 package br.com.fiap.refugio.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,10 +48,15 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
     private List<Ocorrencia> ocorrencias = new ArrayList<>();
 
-    protected Usuario() {
-    }
+    protected Usuario() {}
 
-    public Usuario(String nome, String email, String senhaHash, Papel papel, boolean ativo, Instant criadoEm) {
+    public Usuario(
+            String nome,
+            String email,
+            String senhaHash,
+            Papel papel,
+            boolean ativo,
+            Instant criadoEm) {
         this.nome = nome;
         this.email = email;
         this.senhaHash = senhaHash;

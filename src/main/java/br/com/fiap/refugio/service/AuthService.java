@@ -9,11 +9,11 @@ import br.com.fiap.refugio.model.Papel;
 import br.com.fiap.refugio.model.Usuario;
 import br.com.fiap.refugio.repository.UsuarioRepository;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Locale;
@@ -36,16 +36,26 @@ public class AuthService {
         if (usuarios.findByEmail(email).isPresent()) {
             throw new ApiException(HttpStatus.CONFLICT, "Email já cadastrado");
         }
-        var usuario = usuarios.saveAndFlush(new Usuario(dto.nome().trim(), email, encoder.encode(dto.senha()),
-                Papel.CIDADAO, true, Instant.now()));
-        return new UsuarioResponse(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.getPapel());
+        var usuario =
+                usuarios.saveAndFlush(
+                        new Usuario(
+                                dto.nome().trim(),
+                                email,
+                                encoder.encode(dto.senha()),
+                                Papel.CIDADAO,
+                                true,
+                                Instant.now()));
+        return new UsuarioResponse(
+                usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.getPapel());
     }
 
     @Transactional(readOnly = true)
     public TokenResponse login(LoginRequest dto) {
         validarSenha(dto.senha());
-        var usuario = usuarios.findByEmail(normalizar(dto.email())).filter(Usuario::isAtivo)
-                .orElseThrow(AuthService::credenciaisInvalidas);
+        var usuario =
+                usuarios.findByEmail(normalizar(dto.email()))
+                        .filter(Usuario::isAtivo)
+                        .orElseThrow(AuthService::credenciaisInvalidas);
         if (!encoder.matches(dto.senha(), usuario.getSenhaHash())) {
             throw credenciaisInvalidas();
         }
@@ -54,11 +64,15 @@ public class AuthService {
 
     private static void validarSenha(String senha) {
         if (senha.length() < 8 || senha.getBytes(StandardCharsets.UTF_8).length > 72) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Senha deve ter no mínimo 8 caracteres e no máximo 72 bytes UTF-8");
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Senha deve ter no mínimo 8 caracteres e no máximo 72 bytes UTF-8");
         }
     }
 
-    private static String normalizar(String email) { return email.trim().toLowerCase(Locale.ROOT); }
+    private static String normalizar(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
+    }
 
     private static ApiException credenciaisInvalidas() {
         return new ApiException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas");

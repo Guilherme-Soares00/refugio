@@ -2,8 +2,8 @@ package br.com.fiap.refugio.dto;
 
 import br.com.fiap.refugio.model.StatusPonto;
 
-
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+
 import jakarta.validation.constraints.*;
 
 public record PontoUpdate(
