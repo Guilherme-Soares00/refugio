@@ -187,6 +187,12 @@ $env:TEST_DATABASE_PASSWORD = $credencial.GetNetworkCredential().Password
 
 Ajuste host, porta e usuário à sua instalação. A URL precisa terminar em `/refugio_test`, sem parâmetros. Os relatórios ficam em `target/surefire-reports`.
 
+Para executar somente os testes que não acessam o banco:
+
+```powershell
+.\mvnw.cmd -B '-Dtest=ApiExceptionHandlerTest,OrganizacaoPacotesTest,RefugioApplicationTest,ValidacaoDominioTest' test
+```
+
 ## Cliente web
 
 O [Refúgio Web](https://github.com/Guilherme-Soares00/refugio-web) é um cliente separado, usado para apresentar os fluxos da API no vídeo. Para executá-lo, siga o README desse repositório. A aplicação Java e o PostgreSQL não dependem dele.
