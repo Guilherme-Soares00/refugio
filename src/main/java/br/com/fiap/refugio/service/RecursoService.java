@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -35,8 +36,14 @@ public class RecursoService {
 
     @Transactional(readOnly = true)
     public List<RecursoDetail> listar(Long pontoId) {
-        ponto(pontoId);
-        return recursos.findByPontoIdOrderByIdAsc(pontoId).stream().map(RecursoDetail::de).toList();
+        var ponto =
+                pontos.findDetalhadoById(pontoId)
+                        .orElseThrow(
+                                () -> new ApiException(HttpStatus.NOT_FOUND, "Ponto não encontrado"));
+        return ponto.getRecursos().stream()
+                .sorted(Comparator.comparing(RecursoPonto::getId))
+                .map(RecursoDetail::de)
+                .toList();
     }
 
     @Transactional
@@ -55,7 +62,9 @@ public class RecursoService {
     public void atualizar(Long id, RecursoUpdate dto) {
         RecursoPonto recurso = exigir(id);
         Long anterior = recurso.getPonto().getId();
-        recurso.setPonto(ponto(dto.pontoId()));
+        if (!anterior.equals(dto.pontoId())) {
+            recurso.setPonto(ponto(dto.pontoId()));
+        }
         recurso.setTipo(dto.tipo());
         recurso.setDisponivel(dto.disponivel());
         recurso.setAtualizadoEm(Instant.now());

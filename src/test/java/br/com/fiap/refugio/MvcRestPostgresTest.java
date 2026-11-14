@@ -29,19 +29,23 @@ class MvcRestPostgresTest {
     private final JdbcTemplate jdbc;
     private final org.springframework.core.env.Environment environment;
     private final jakarta.persistence.EntityManagerFactory entityManagerFactory;
+    private final org.springframework.cache.CacheManager cache;
 
     MvcRestPostgresTest(MockMvc mvc, ObjectMapper mapper, JdbcTemplate jdbc,
                         org.springframework.core.env.Environment environment,
-                        jakarta.persistence.EntityManagerFactory entityManagerFactory) {
+                        jakarta.persistence.EntityManagerFactory entityManagerFactory,
+                        org.springframework.cache.CacheManager cache) {
         this.mvc = mvc;
         this.mapper = mapper;
         this.jdbc = jdbc;
         this.environment = environment;
         this.entityManagerFactory = entityManagerFactory;
+        this.cache = cache;
     }
 
     @org.junit.jupiter.api.BeforeEach
     void limparFixtures() throws Exception {
+        cache.getCache("pontoDetalhe").clear();
         jdbc.execute("truncate table ocorrencia, medicao, recurso_ponto, ponto_refugio, usuario restart identity cascade");
         mvc.perform(post("/api/auth/cadastro").contentType("application/json").content("{\"nome\":\"Gestor teste\",\"email\":\"mvc@example.test\",\"senha\":\"SenhaTeste2026!\"}"))
                 .andExpect(status().isCreated());
@@ -153,6 +157,75 @@ class MvcRestPostgresTest {
     }
 
     @Test
+    void listaRecursosEmUmaConsultaSemCarregarMedicoesEOrdenaPorId() throws Exception {
+        long pontoId = criarPonto("REF-204").get("id").asLong();
+        long outro = criarPonto("REF-205").get("id").asLong();
+        criarMedicao(pontoId, "32", "50", "2026-11-09T09:00:00Z");
+        jdbc.update("insert into recurso_ponto(id,ponto_id,tipo,disponivel,atualizado_em) values (30,?,'SOMBRA',true,now()),(10,?,'AGUA',false,now()),(20,?,'ASSENTO',true,now()),(5,?,'AGUA',true,now())",
+                pontoId, pontoId, pontoId, outro);
+        var estatisticas = entityManagerFactory.unwrap(org.hibernate.SessionFactory.class).getStatistics();
+        estatisticas.clear();
+        mvc.perform(get("/api/pontos/{id}/recursos", pontoId)).andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
+                .andExpect(jsonPath("$._embedded.recursos.length()").value(3))
+                .andExpect(jsonPath("$._embedded.recursos[0].id").value(10))
+                .andExpect(jsonPath("$._embedded.recursos[1].id").value(20))
+                .andExpect(jsonPath("$._embedded.recursos[2].id").value(30))
+                .andExpect(jsonPath("$._embedded.recursos[0].pontoId").value(pontoId))
+                .andExpect(jsonPath("$._embedded.recursos[0].tipo").value("AGUA"))
+                .andExpect(jsonPath("$._embedded.recursos[0].disponivel").value(false))
+                .andExpect(jsonPath("$._embedded.recursos[0].atualizadoEm").isNotEmpty())
+                .andExpect(jsonPath("$._embedded.recursos[0].ponto").doesNotExist())
+                .andExpect(jsonPath("$._embedded.recursos[0]._links.ponto.href").value("http://localhost/api/pontos/" + pontoId))
+                .andExpect(jsonPath("$._links.self.href").value("http://localhost/api/pontos/" + pontoId + "/recursos"));
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> assertThat(estatisticas.getPrepareStatementCount()).isOne(),
+                () -> assertThat(estatisticas.getEntityStatistics("br.com.fiap.refugio.model.PontoRefugio").getLoadCount()).isOne(),
+                () -> assertThat(estatisticas.getEntityStatistics("br.com.fiap.refugio.model.RecursoPonto").getLoadCount()).isEqualTo(3),
+                () -> assertThat(estatisticas.getEntityStatistics("br.com.fiap.refugio.model.Medicao").getLoadCount()).isZero(),
+                () -> assertThat(estatisticas.getEntityStatistics("br.com.fiap.refugio.model.Usuario").getLoadCount()).isZero());
+    }
+
+    @Test
+    void atualizaRecursoNoMesmoPaiSemCarregaLoEInvalidaDetalhe() throws Exception {
+        long pontoId = criarPonto("REF-206").get("id").asLong();
+        JsonNode recurso = mapper.readTree(mvc.perform(post("/api/recursos").header("Authorization", "Bearer " + token).contentType("application/json")
+                .content(recursoJson(pontoId, "AGUA", "false"))).andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString());
+        long id = recurso.get("id").asLong();
+        mvc.perform(get("/api/pontos/{id}", pontoId)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.recursos[0].disponivel").value(false));
+        var estatisticas = entityManagerFactory.unwrap(org.hibernate.SessionFactory.class).getStatistics();
+        estatisticas.clear();
+        mvc.perform(get("/api/pontos/{id}", pontoId)).andExpect(status().isOk());
+        assertThat(estatisticas.getPrepareStatementCount()).isZero();
+        estatisticas.clear();
+        mvc.perform(put("/api/recursos/{id}", id).header("Authorization", "Bearer " + token).contentType("application/json")
+                .content(recursoJson(pontoId, "SOMBRA", "true"))).andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> assertThat(estatisticas.getPrepareStatementCount()).isEqualTo(3),
+                () -> assertThat(estatisticas.getEntityStatistics("br.com.fiap.refugio.model.Usuario").getLoadCount()).isOne(),
+                () -> assertThat(estatisticas.getEntityStatistics("br.com.fiap.refugio.model.RecursoPonto").getLoadCount()).isOne(),
+                () -> assertThat(estatisticas.getEntityStatistics("br.com.fiap.refugio.model.PontoRefugio").getLoadCount()).isZero(),
+                () -> assertThat(estatisticas.getEntityUpdateCount()).isOne());
+        estatisticas.clear();
+        JsonNode atualizado = mapper.readTree(mvc.perform(get("/api/pontos/{id}", pontoId)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.recursos[0].id").value(id))
+                .andExpect(jsonPath("$.recursos[0].pontoId").value(pontoId))
+                .andExpect(jsonPath("$.recursos[0].tipo").value("SOMBRA"))
+                .andExpect(jsonPath("$.recursos[0].disponivel").value(true))
+                .andReturn().getResponse().getContentAsString());
+        assertThat(estatisticas.getPrepareStatementCount()).isEqualTo(2);
+        assertThat(java.time.Instant.parse(atualizado.get("recursos").get(0).get("atualizadoEm").asText()))
+                .isAfter(java.time.Instant.parse(recurso.get("atualizadoEm").asText()));
+        estatisticas.clear();
+        mvc.perform(get("/api/pontos/{id}", pontoId)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.recursos[0].disponivel").value(true));
+        assertThat(estatisticas.getPrepareStatementCount()).isZero();
+    }
+
+    @Test
     void recursoCrudPermiteTrocarPaiEProtegeUnicidade() throws Exception {
         long primeiro = criarPonto("REF-201").get("id").asLong();
         long segundo = criarPonto("REF-202").get("id").asLong();
@@ -166,21 +239,58 @@ class MvcRestPostgresTest {
         mvc.perform(delete("/api/pontos/{id}", primeiro).header("Authorization", "Bearer " + token)).andExpect(status().isConflict());
         mvc.perform(post("/api/recursos").header("Authorization", "Bearer " + token).contentType("application/json").content(recursoJson(segundo, "SOMBRA", "true")))
                 .andExpect(status().isCreated());
+        mvc.perform(get("/api/pontos/{id}", primeiro)).andExpect(status().isOk());
+        mvc.perform(get("/api/pontos/{id}", segundo)).andExpect(status().isOk());
+        var antes = jdbc.queryForMap("select * from recurso_ponto where id=?", id);
         mvc.perform(put("/api/recursos/{id}", id).header("Authorization", "Bearer " + token).contentType("application/json").content(recursoJson(segundo, "SOMBRA", "false")))
                 .andExpect(status().isConflict());
+        assertThat(jdbc.queryForMap("select * from recurso_ponto where id=?", id)).isEqualTo(antes);
+        var estatisticas = entityManagerFactory.unwrap(org.hibernate.SessionFactory.class).getStatistics();
+        estatisticas.clear();
+        mvc.perform(get("/api/pontos/{id}", primeiro)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.recursos[0].tipo").value("AGUA"))
+                .andExpect(jsonPath("$.recursos[0].disponivel").value(false));
+        mvc.perform(get("/api/pontos/{id}", segundo)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.recursos.length()").value(1));
+        assertThat(estatisticas.getPrepareStatementCount()).isZero();
+        estatisticas.clear();
         mvc.perform(put("/api/recursos/{id}", id).header("Authorization", "Bearer " + token).contentType("application/json").content(recursoJson(segundo, "AGUA", "true")))
-                .andExpect(status().isNoContent());
-        mvc.perform(get("/api/pontos/{id}/recursos", primeiro)).andExpect(jsonPath("$._embedded").doesNotExist());
-        mvc.perform(get("/api/pontos/{id}", segundo)).andExpect(jsonPath("$.recursos.length()").value(2));
+                .andExpect(status().isNoContent()).andExpect(content().string(""));
+        assertThat(estatisticas.getPrepareStatementCount()).isEqualTo(4);
+        assertThat(estatisticas.getEntityStatistics("br.com.fiap.refugio.model.Usuario").getLoadCount()).isOne();
+        assertThat(estatisticas.getEntityStatistics("br.com.fiap.refugio.model.PontoRefugio").getLoadCount()).isOne();
+        assertThat(estatisticas.getEntityUpdateCount()).isOne();
+        estatisticas.clear();
+        mvc.perform(get("/api/pontos/{id}", primeiro)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.recursos").isEmpty());
+        mvc.perform(get("/api/pontos/{id}", segundo)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.recursos.length()").value(2));
+        assertThat(estatisticas.getPrepareStatementCount()).isEqualTo(4);
+        mvc.perform(get("/api/pontos/{id}/recursos", primeiro)).andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded").doesNotExist());
         mvc.perform(delete("/api/recursos/{id}", id).header("Authorization", "Bearer " + token)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/pontos/{id}", segundo)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.recursos.length()").value(1))
+                .andExpect(jsonPath("$.recursos[0].tipo").value("SOMBRA"));
         mvc.perform(delete("/api/recursos/{id}", id).header("Authorization", "Bearer " + token)).andExpect(status().isNotFound());
     }
 
     @Test
     void validaRecursoENaoConfundePaiAusenteComListaVazia() throws Exception {
         long pontoId = criarPonto("REF-203").get("id").asLong();
-        mvc.perform(get("/api/pontos/{id}/recursos", pontoId)).andExpect(status().isOk()).andExpect(jsonPath("$._embedded").doesNotExist());
-        mvc.perform(get("/api/pontos/999999/recursos")).andExpect(status().isNotFound());
+        var estatisticas = entityManagerFactory.unwrap(org.hibernate.SessionFactory.class).getStatistics();
+        estatisticas.clear();
+        mvc.perform(get("/api/pontos/{id}/recursos", pontoId)).andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded").doesNotExist())
+                .andExpect(jsonPath("$._links.self.href").value("http://localhost/api/pontos/" + pontoId + "/recursos"));
+        assertThat(estatisticas.getPrepareStatementCount()).isOne();
+        estatisticas.clear();
+        mvc.perform(get("/api/pontos/999999/recursos")).andExpect(status().isNotFound())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.mensagem").value("Ponto não encontrado"))
+                .andExpect(jsonPath("$.path").value("/api/pontos/999999/recursos"));
+        assertThat(estatisticas.getPrepareStatementCount()).isOne();
         for (String body : new String[]{"{}", recursoJson(pontoId, "AGUA", "null"), recursoJson(pontoId, "INVALIDO", "true")}) {
             mvc.perform(post("/api/recursos").header("Authorization", "Bearer " + token).contentType("application/json").content(body)).andExpect(status().isBadRequest());
         }
@@ -188,10 +298,29 @@ class MvcRestPostgresTest {
                 .andExpect(status().isNotFound());
         mvc.perform(put("/api/recursos/999999").header("Authorization", "Bearer " + token).contentType("application/json").content(recursoJson(pontoId, "AGUA", "true")))
                 .andExpect(status().isNotFound());
-        mvc.perform(post("/api/recursos").header("Authorization", "Bearer " + token).contentType("application/json").content(recursoJson(pontoId, "AGUA", "true")))
-                .andExpect(status().isCreated());
+        long id = mapper.readTree(mvc.perform(post("/api/recursos").header("Authorization", "Bearer " + token).contentType("application/json").content(recursoJson(pontoId, "AGUA", "true")))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString()).get("id").asLong();
         mvc.perform(post("/api/recursos").header("Authorization", "Bearer " + token).contentType("application/json").content(recursoJson(pontoId, "AGUA", "false")))
                 .andExpect(status().isConflict());
+        mvc.perform(get("/api/pontos/{id}", pontoId)).andExpect(status().isOk());
+        var antes = jdbc.queryForMap("select * from recurso_ponto where id=?", id);
+        estatisticas.clear();
+        mvc.perform(put("/api/recursos/{id}", id).header("Authorization", "Bearer " + token).contentType("application/json")
+                .content(recursoJson(999999, "SOMBRA", "false"))).andExpect(status().isNotFound())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.mensagem").value("Ponto não encontrado"))
+                .andExpect(jsonPath("$.path").value("/api/recursos/" + id));
+        assertThat(estatisticas.getPrepareStatementCount()).isEqualTo(3);
+        assertThat(estatisticas.getEntityStatistics("br.com.fiap.refugio.model.Usuario").getLoadCount()).isOne();
+        assertThat(estatisticas.getEntityUpdateCount()).isZero();
+        assertThat(jdbc.queryForMap("select * from recurso_ponto where id=?", id)).isEqualTo(antes);
+        estatisticas.clear();
+        mvc.perform(get("/api/pontos/{id}", pontoId)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.recursos[0].pontoId").value(pontoId))
+                .andExpect(jsonPath("$.recursos[0].tipo").value("AGUA"))
+                .andExpect(jsonPath("$.recursos[0].disponivel").value(true));
+        assertThat(estatisticas.getPrepareStatementCount()).isZero();
     }
 
     private String medicaoJson(long pontoId, String temperatura, String umidade, String instante) {
