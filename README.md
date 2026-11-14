@@ -11,11 +11,11 @@ O Refúgio reúne informações sobre pontos de alívio térmico, seus horários
 
 ## Tecnologias
 
-Java 21, Spring Boot 3.5.16, Maven Wrapper e PostgreSQL 16. A API usa Spring Data JPA, Bean Validation, Spring Security com JWT, Spring Cache, HATEOAS, Actuator e Swagger/OpenAPI.
+Java 25, Spring Boot 3.5.16, Maven Wrapper e PostgreSQL 16. A API usa Spring Data JPA, Bean Validation, Spring Security com JWT, Spring Cache, HATEOAS, Actuator e Swagger/OpenAPI.
 
 ## Executar pelo IntelliJ
 
-É necessário ter JDK 21, IntelliJ IDEA e PostgreSQL 16. O Maven Wrapper está incluído no repositório; não é preciso instalar Maven separadamente.
+É necessário ter JDK 25, IntelliJ IDEA e PostgreSQL 16. O Maven Wrapper está incluído no repositório; não é preciso instalar Maven separadamente.
 
 ### 1. Baixar o projeto
 
@@ -24,7 +24,7 @@ git clone https://github.com/Guilherme-Soares00/refugio.git
 Set-Location .\refugio
 ```
 
-Abra essa pasta no IntelliJ e importe o `pom.xml`. Configure o SDK do projeto e o Maven Runner com JDK 21, sem preview.
+Abra essa pasta no IntelliJ e importe o `pom.xml`. Configure o SDK do projeto e o Maven Runner com JDK 25, sem preview.
 
 ### 2. Preparar o PostgreSQL
 
@@ -46,7 +46,7 @@ Em **Run > Edit Configurations**, selecione a configuração de `RefugioApplicat
 
 - Classe principal: `br.com.fiap.refugio.RefugioApplication`.
 - Módulo: `refugio`.
-- JDK: 21.
+- JDK: 25.
 - Diretório de trabalho: a raiz do projeto.
 
 No campo **Environment variables**, configure:
