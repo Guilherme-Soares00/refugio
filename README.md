@@ -6,8 +6,11 @@ O Refúgio reúne informações sobre pontos de alívio térmico, seus horários
 
 | Integrante | RM | Turma |
 | --- | --- | --- |
-| Guilherme Soares | 568227 | A preencher pela equipe |
-| Demais integrantes | A preencher pela equipe | A preencher pela equipe |
+| Luis Fillipe Rodrigues Seripieri | 567918 | 2TDSPB |
+| Gabriel Rocha de Souza | 567023 | 2TDSPB |
+| Luiz Kichimoto Valdevino | 567726 | 2TDSPB |
+| Guilherme Soares | 568227 | 2TDSPB |
+| Gabriel Stuani | 566682 | 2TDSPB |
 
 ## Tecnologias
 
