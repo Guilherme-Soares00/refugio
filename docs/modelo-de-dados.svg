@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="1150" viewBox="0 0 1360 1150" role="img" aria-labelledby="title description">
+<title id="title">Refúgio — modelo de dados</title>
+<desc id="description">Cinco entidades. Um ponto de refúgio pode ter zero ou várias medições, recursos e ocorrências. Um usuário pode registrar zero ou várias ocorrências. Cada medição e recurso pertence a um único ponto. Cada ocorrência tem exatamente um ponto e um usuário. PK identifica a chave primária; FK identifica a chave estrangeira. O par ponto e tipo é único em recurso_ponto.</desc>
+<defs>
+<marker id="arrow-medicao" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0L7 3.5L0 7Z" fill="#167f8d"/></marker>
+<marker id="arrow-recurso" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0L7 3.5L0 7Z" fill="#3466b2"/></marker>
+<marker id="arrow-ocorrencia" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0L7 3.5L0 7Z" fill="#a35f28"/></marker>
+<marker id="arrow-usuario" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0L7 3.5L0 7Z" fill="#7952b0"/></marker>
+</defs>
+<rect x="0" y="0" width="1360" height="1150" rx="0" fill="#f5f8fa"/>
+<rect x="64" y="43" width="34" height="5" rx="2" fill="#27745d"/>
+<text x="112" y="52" font-family="Segoe UI, Arial, sans-serif" font-size="17" fill="#27745d" font-weight="700" text-anchor="start">REFÚGIO / MODELO DE DADOS</text>
+<text x="64" y="109" font-family="Segoe UI, Arial, sans-serif" font-size="40" fill="#172c38" font-weight="700" text-anchor="start">Como os dados se conectam</text>
+<text x="64" y="146" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#536474" font-weight="400" text-anchor="start">Pontos reúnem recursos, medições e relatos. Usuários são os autores das ocorrências.</text>
+<g id="relation-medicao">
+<path d="M435 492 V540 H244 V654" stroke="#167f8d" stroke-width="2.6" fill="none" stroke-linejoin="round" marker-end="url(#arrow-medicao)"/>
+<text x="451" y="520" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#167f8d" font-weight="700" text-anchor="start">1</text>
+<text x="260" y="644" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#167f8d" font-weight="650" text-anchor="start">0..N</text>
+<rect x="138.0" y="565" width="212" height="37" rx="10" fill="#f5f8fa"/>
+<text x="244" y="590" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#167f8d" font-weight="600" text-anchor="middle">recebe medições</text>
+</g>
+<g id="relation-recurso">
+<path d="M615 492 V654" stroke="#3466b2" stroke-width="2.6" fill="none" stroke-linejoin="round" marker-end="url(#arrow-recurso)"/>
+<text x="631" y="520" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#3466b2" font-weight="700" text-anchor="start">1</text>
+<text x="631" y="644" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#3466b2" font-weight="650" text-anchor="start">0..N</text>
+<rect x="518.0" y="565" width="194" height="37" rx="10" fill="#f5f8fa"/>
+<text x="615" y="590" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#3466b2" font-weight="600" text-anchor="middle">possui recursos</text>
+</g>
+<g id="relation-ocorrencia">
+<path d="M795 492 V540 H1006 V654" stroke="#a35f28" stroke-width="2.6" fill="none" stroke-linejoin="round" marker-end="url(#arrow-ocorrencia)"/>
+<text x="811" y="520" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#a35f28" font-weight="700" text-anchor="start">1</text>
+<text x="1022" y="644" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#a35f28" font-weight="650" text-anchor="start">0..N</text>
+<rect x="912.0" y="565" width="188" height="37" rx="10" fill="#f5f8fa"/>
+<text x="1006" y="590" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#a35f28" font-weight="600" text-anchor="middle">recebe relatos</text>
+</g>
+<g id="relation-usuario">
+<path d="M1210 492 V654" stroke="#7952b0" stroke-width="2.6" fill="none" stroke-linejoin="round" marker-end="url(#arrow-usuario)"/>
+<text x="1226" y="520" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#7952b0" font-weight="700" text-anchor="start">1</text>
+<text x="1226" y="644" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#7952b0" font-weight="650" text-anchor="start">0..N</text>
+<rect x="1148.0" y="565" width="124" height="37" rx="10" fill="#f5f8fa"/>
+<text x="1210" y="590" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#7952b0" font-weight="600" text-anchor="middle">registra</text>
+</g>
+<g id="entity-PontoRefugio" data-entity="PontoRefugio">
+<rect x="400" y="184" width="430" height="312" rx="18" fill="#e8edef"/>
+<rect x="400" y="180" width="430" height="312" rx="18" fill="#ffffff" stroke="#dbe3e7"/>
+<path d="M418 180H812Q830 180 830 198V264H400V198Q400 180 418 180Z" fill="#e7f3ed"/>
+<rect x="422" y="201" width="5" height="41" rx="2" fill="#27745d"/>
+<text x="442" y="215" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#27745d" font-weight="650" text-anchor="start">Ponto de refúgio</text>
+<text x="442" y="243" font-family="Consolas, Liberation Mono, monospace" font-size="17" fill="#536474" font-weight="500" text-anchor="start">PONTO_REFUGIO</text>
+<g data-fields="id">
+<rect x="424" y="272" width="38" height="27" rx="6" fill="#e7f3ed"/>
+<text x="443" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#27745d" font-weight="700" text-anchor="middle">PK</text>
+<text x="474" y="294" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">id</text>
+</g>
+<g data-fields="codigoPublico">
+<rect x="424" y="306" width="38" height="27" rx="6" fill="#e7f3ed"/>
+<text x="443" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#27745d" font-weight="700" text-anchor="middle">UQ</text>
+<text x="474" y="328" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">codigoPublico</text>
+</g>
+<g data-fields="nome">
+<text x="424" y="362" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">nome</text>
+</g>
+<g data-fields="logradouro,numero,bairro">
+<text x="424" y="396" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">logradouro · numero · bairro</text>
+</g>
+<g data-fields="cidade,uf,horarioTexto">
+<text x="424" y="430" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">cidade · uf · horarioTexto</text>
+</g>
+<g data-fields="status,cadastradoEm">
+<text x="424" y="464" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">status · cadastradoEm</text>
+</g>
+</g>
+<g id="entity-Usuario" data-entity="Usuario">
+<rect x="940" y="184" width="356" height="312" rx="18" fill="#e8edef"/>
+<rect x="940" y="180" width="356" height="312" rx="18" fill="#ffffff" stroke="#dbe3e7"/>
+<path d="M958 180H1278Q1296 180 1296 198V264H940V198Q940 180 958 180Z" fill="#f0ebf8"/>
+<rect x="962" y="201" width="5" height="41" rx="2" fill="#7952b0"/>
+<text x="982" y="215" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#7952b0" font-weight="650" text-anchor="start">Usuário</text>
+<text x="982" y="243" font-family="Consolas, Liberation Mono, monospace" font-size="17" fill="#536474" font-weight="500" text-anchor="start">USUARIO</text>
+<g data-fields="id">
+<rect x="964" y="272" width="38" height="27" rx="6" fill="#f0ebf8"/>
+<text x="983" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#7952b0" font-weight="700" text-anchor="middle">PK</text>
+<text x="1014" y="294" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">id</text>
+</g>
+<g data-fields="nome">
+<text x="964" y="328" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">nome</text>
+</g>
+<g data-fields="email">
+<rect x="964" y="340" width="38" height="27" rx="6" fill="#f0ebf8"/>
+<text x="983" y="360" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#7952b0" font-weight="700" text-anchor="middle">UQ</text>
+<text x="1014" y="362" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">email</text>
+</g>
+<g data-fields="senhaHash">
+<text x="964" y="396" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">senhaHash (BCrypt)</text>
+</g>
+<g data-fields="papel,ativo">
+<text x="964" y="430" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">papel · ativo</text>
+</g>
+<g data-fields="criadoEm">
+<text x="964" y="464" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">criadoEm</text>
+</g>
+</g>
+<g id="entity-Medicao" data-entity="Medicao">
+<rect x="64" y="664" width="360" height="344" rx="18" fill="#e8edef"/>
+<rect x="64" y="660" width="360" height="344" rx="18" fill="#ffffff" stroke="#dbe3e7"/>
+<path d="M82 660H406Q424 660 424 678V744H64V678Q64 660 82 660Z" fill="#e9f4f6"/>
+<rect x="86" y="681" width="5" height="41" rx="2" fill="#167f8d"/>
+<text x="106" y="695" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#167f8d" font-weight="650" text-anchor="start">Medição</text>
+<text x="106" y="723" font-family="Consolas, Liberation Mono, monospace" font-size="17" fill="#536474" font-weight="500" text-anchor="start">MEDICAO</text>
+<g data-fields="id">
+<rect x="88" y="752" width="38" height="27" rx="6" fill="#e9f4f6"/>
+<text x="107" y="772" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#167f8d" font-weight="700" text-anchor="middle">PK</text>
+<text x="138" y="774" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">id</text>
+</g>
+<g data-fields="ponto">
+<rect x="88" y="786" width="38" height="27" rx="6" fill="#e9f4f6"/>
+<text x="107" y="806" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#167f8d" font-weight="700" text-anchor="middle">FK</text>
+<text x="138" y="808" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">ponto_id</text>
+</g>
+<g data-fields="temperaturaC,umidadePct">
+<text x="88" y="842" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">temperaturaC · umidadePct</text>
+</g>
+<g data-fields="origem">
+<text x="88" y="876" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">origem</text>
+</g>
+<g data-fields="medidaEm">
+<text x="88" y="910" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">medidaEm</text>
+</g>
+<rect x="84" y="952" width="320" height="34" rx="8" fill="#e9f4f6"/>
+<text x="244.0" y="975" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#167f8d" font-weight="500" text-anchor="middle">Temperatura (°C) e umidade (%)</text>
+</g>
+<g id="entity-RecursoPonto" data-entity="RecursoPonto">
+<rect x="500" y="664" width="360" height="344" rx="18" fill="#e8edef"/>
+<rect x="500" y="660" width="360" height="344" rx="18" fill="#ffffff" stroke="#dbe3e7"/>
+<path d="M518 660H842Q860 660 860 678V744H500V678Q500 660 518 660Z" fill="#eaf0fb"/>
+<rect x="522" y="681" width="5" height="41" rx="2" fill="#3466b2"/>
+<text x="542" y="695" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#3466b2" font-weight="650" text-anchor="start">Recurso do ponto</text>
+<text x="542" y="723" font-family="Consolas, Liberation Mono, monospace" font-size="17" fill="#536474" font-weight="500" text-anchor="start">RECURSO_PONTO</text>
+<g data-fields="id">
+<rect x="524" y="752" width="38" height="27" rx="6" fill="#eaf0fb"/>
+<text x="543" y="772" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#3466b2" font-weight="700" text-anchor="middle">PK</text>
+<text x="574" y="774" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">id</text>
+</g>
+<g data-fields="ponto">
+<rect x="524" y="786" width="38" height="27" rx="6" fill="#eaf0fb"/>
+<text x="543" y="806" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#3466b2" font-weight="700" text-anchor="middle">FK</text>
+<text x="574" y="808" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">ponto_id</text>
+</g>
+<g data-fields="tipo">
+<text x="524" y="842" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">tipo</text>
+</g>
+<g data-fields="disponivel">
+<text x="524" y="876" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">disponivel</text>
+</g>
+<g data-fields="atualizadoEm">
+<text x="524" y="910" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">atualizadoEm</text>
+</g>
+<rect x="520" y="952" width="320" height="34" rx="8" fill="#eaf0fb"/>
+<text x="680.0" y="975" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#3466b2" font-weight="500" text-anchor="middle">Único por ponto + tipo</text>
+</g>
+<g id="entity-Ocorrencia" data-entity="Ocorrencia">
+<rect x="936" y="664" width="360" height="344" rx="18" fill="#e8edef"/>
+<rect x="936" y="660" width="360" height="344" rx="18" fill="#ffffff" stroke="#dbe3e7"/>
+<path d="M954 660H1278Q1296 660 1296 678V744H936V678Q936 660 954 660Z" fill="#fbefe4"/>
+<rect x="958" y="681" width="5" height="41" rx="2" fill="#a35f28"/>
+<text x="978" y="695" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#a35f28" font-weight="650" text-anchor="start">Ocorrência</text>
+<text x="978" y="723" font-family="Consolas, Liberation Mono, monospace" font-size="17" fill="#536474" font-weight="500" text-anchor="start">OCORRENCIA</text>
+<g data-fields="id">
+<rect x="960" y="752" width="38" height="27" rx="6" fill="#fbefe4"/>
+<text x="979" y="772" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#a35f28" font-weight="700" text-anchor="middle">PK</text>
+<text x="1010" y="774" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">id</text>
+</g>
+<g data-fields="ponto">
+<rect x="960" y="786" width="38" height="27" rx="6" fill="#fbefe4"/>
+<text x="979" y="806" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#a35f28" font-weight="700" text-anchor="middle">FK</text>
+<text x="1010" y="808" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">ponto_id</text>
+</g>
+<g data-fields="usuario">
+<rect x="960" y="820" width="38" height="27" rx="6" fill="#fbefe4"/>
+<text x="979" y="840" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#a35f28" font-weight="700" text-anchor="middle">FK</text>
+<text x="1010" y="842" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">usuario_id</text>
+</g>
+<g data-fields="categoria,prioridade">
+<text x="960" y="876" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">categoria · prioridade</text>
+</g>
+<g data-fields="descricao,status">
+<text x="960" y="910" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">descricao · status</text>
+</g>
+<g data-fields="abertaEm,resolvidaEm">
+<text x="960" y="944" font-family="Consolas, Liberation Mono, monospace" font-size="21" fill="#243343" font-weight="400" text-anchor="start">abertaEm · resolvidaEm</text>
+</g>
+</g>
+<rect x="64" y="1040" width="1232" height="78" rx="14" fill="#ffffff" stroke="#e0e7ec"/>
+<text x="86" y="1071" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#243343" font-weight="700" text-anchor="start">1</text>
+<text x="107" y="1071" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#536474" font-weight="400" text-anchor="start">= um registro</text>
+<text x="300" y="1071" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#243343" font-weight="700" text-anchor="start">0..N</text>
+<text x="361" y="1071" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#536474" font-weight="400" text-anchor="start">= nenhum ou vários</text>
+<text x="86" y="1100" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#536474" font-weight="400" text-anchor="start">PK = chave primária     FK = chave estrangeira no banco     UQ = valor único</text>
+<text x="1269" y="1071" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#536474" font-weight="400" text-anchor="end">Cada vínculo aponta para um único registro pai.</text>
+</svg>

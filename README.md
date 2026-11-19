@@ -145,13 +145,11 @@ Criações retornam 201; consultas, 200; alterações e exclusões, 204. Erros u
 
 ## Modelo de dados
 
-```mermaid
-erDiagram
-    USUARIO ||--o{ OCORRENCIA : registra
-    PONTO_REFUGIO ||--o{ RECURSO_PONTO : possui
-    PONTO_REFUGIO ||--o{ MEDICAO : recebe
-    PONTO_REFUGIO ||--o{ OCORRENCIA : recebe
-```
+[![Modelo de dados do Refúgio: pontos, usuários, medições, recursos e ocorrências](docs/modelo-de-dados.svg)](docs/modelo-de-dados.svg)
+
+**Abrir diagrama:** [SVG — vetorial](docs/modelo-de-dados.svg) · [PNG — alta resolução](docs/modelo-de-dados.png).
+
+Um ponto pode ter várias medições, recursos e ocorrências. Cada ocorrência está ligada a um único ponto e a um único usuário, que é seu autor. As marcações `1` e `0..N` indicam essas cardinalidades; `PK`, `FK` e `UQ` identificam as chaves e os valores únicos.
 
 Os relacionamentos usam carregamento `LAZY`. Não há remoção em cascata das coleções, para evitar a perda do histórico. O detalhe de um ponto busca seus recursos e a última medição sem carregar todas as medições e ocorrências. A conversão para DTO ocorre dentro da transação, com `open-in-view=false`.
 
