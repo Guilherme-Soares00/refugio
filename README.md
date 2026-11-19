@@ -1,5 +1,8 @@
 # Refúgio
 
+- **Vídeo técnico:** [Apresentação técnica do Refúgio](https://youtu.be/8sO_BTyX5xY)
+- **Pitch:** [Apresentação da solução](https://youtu.be/MD8SzKHm8QI)
+
 O Refúgio reúne informações sobre pontos de alívio térmico, seus horários, recursos e condições ambientais. A API permite consultar os locais, registrar ocorrências e acompanhar o atendimento. Gestores mantêm os cadastros e atualizam a situação dos relatos.
 
 ## Equipe
